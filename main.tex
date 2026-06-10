@@ -1,0 +1,27 @@
+\documentclass[12pt]{article}
+\include{acronyms}  % just include this, which also has your acronyms 
+\begin{document}
+
+\setlength{\parskip}{\baselineskip}%
+
+This sample project demonstrates how you can get tooltip popups for your acronyms, along with highlighting in bold and color the original acronym definition.
+
+% \xx (singular} and \xxx (plural) insert acronyms
+Just  \texttt{\string\include\{acronyms\}} at the start of your latex source.
+
+Use \texttt{\string\xx\{ac\}} for singular form 
+and \texttt{\string\xxx\{ac\}}  for plural form.
+
+See \textit{acronyms.tex} for the code and your personal acronyms. Customize the colors there.
+
+Here is some sample text: 
+Testing \xx{of} algorithms is hard because \xx{of} requires good \xx{gt} data. 
+Also, you need lots of \xx{bram} because \xx{of} takes a lot of memory, particularly for \xx{bm}. 
+\xx{bm} produces flow vectors and can be combined with corner detection to disambiguate flow along edges.
+It is much more useful that simplified biologically-inspired \xx{ds} flow.
+But \xx{bram} is costly. 
+Using many \xxx{bram} % note plural form
+will cost you a lot of money for big \xxx{fpga}. 
+But it enabled \xx{bm} \xx{of} on \xxx{fpga}, more accurate than \xx{ds} models of the past and results much closer to \xx{gt} flow.
+
+\end{document}

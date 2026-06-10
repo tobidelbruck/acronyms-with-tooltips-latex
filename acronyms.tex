@@ -1,0 +1,89 @@
+% Include this acronyms with your abbreviations, acronyms, etc in your main.tex using
+% \include{acronyms}
+% see below for color options. See end of file for personal definitions of acronyms.
+
+% author: Tobi Delbruck (tobi@ini.uzh.ch), thanks to gemini AI https://gemini.google.com/share/48280cfc093a
+
+% To insert acronym,  use \xx{ac} where ac is the lowercase acronym shortcut for normal acronyms, gives them a PDF tooltip popup
+% use \xxx{ac} for plural form
+
+% \usepackage{pdfcomment}
+\input{pdfcomment-patched} % patches pdfcomment so that it uses rect and not javascript button, which muPDF and PDF.js rightfully refuse to abuse for tooltips
+
+\usepackage[hyperfirst=false,acronym,sort=none,shortcuts,nopostdot,style=super,nonumberlist,toc,nogroupskip]{glossaries}
+\usepackage[dvipsnames]{xcolor} % used for colored acronyms
+
+\glsdisablehyper % to disable hyperlinks on all acronyms
+
+% choose color for your acronyms short form and long (full) text
+\newcommand{\accolor}[1]{\textcolor{Black}{#1}} % Can also use Sepia is nearly black red, stands out very slightly.
+\newcommand*{\glossfirstformat}[1]{\accolor{#1}} % use to make first definition special format
+
+% choose your color for bold first definition of the acronym
+%https://tex.stackexchange.com/questions/232707/modify-appearance-of-first-acronym
+\newcommand*{\acfirstformat}[1]{\textcolor{Sepia}{\textbf{#1}}} % Bittersweet is a muted but brighter red. Sepia is darker. Use Black for no color.
+% \newcommand*{\acplfirstformat}[1]{\textcolor{Red}{\textbf{#1}}}
+
+% don't touch following
+\newacronymstyle{myacro}
+{%
+  \GlsUseAcrEntryDispStyle{long-short}%
+}%
+{%
+  \GlsUseAcrStyleDefs{long-short}%
+  \renewcommand*{\genacrfullformat}[1]{%
+   \glossfirstformat{\glsentrylong{##1}}\space
+   (\acfirstformat{\glsentryshort{##1}})%
+  }%
+  \renewcommand*{\Genacrfullformat}[2]{%
+   \glossfirstformat{\Glsentrylong{##1}}\space
+   (\glsentryshort{##1})%
+  }%
+  \renewcommand*{\genplacrfullformat}[2]{%
+   \glossfirstformat{\glsentrylongpl{##1}}\space
+   (\acplfirstformat{\glsentryshort{##1}})%
+  }%
+  \renewcommand*{\Genplacrfullformat}[2]{%
+   \glossfirstformat{\Glsentrylongpl{##1}}\space
+   (\glsentryshortpl{##1})%
+  }%
+}
+
+\setacronymstyle{myacro}
+
+% use \xx{ac} where ac is the lowercase acronym shortcut for normal acronyms, gives them a PDF tooltip popup
+\newcommand*{\xx}[1]{%  define our acronym command,  make it short since we use it a lot, use * for so that it is only a 'short' command
+    \ifglsused{#1}{% if we used it already, then put pdftooltip
+      {\pdftooltip{\accolor{\glsentryshort{#1}}}{\glsentrydesc{#1}}}%
+      % was sugggested by latex maintainers to use pdfsquarecomment but it does not render as popup around the acronynm and shows up as ugly comment marker in acrobat
+      % {{\accolor{\glsentryshort{#1}}}\pdfsquarecomment{\glsentrydesc{#1}}}%
+    }{%
+      \gls{#1}% otherwise put the normal gls
+    }%
+}%
+
+% use\xxx{ac} for plural acronyms
+\newcommand*{\xxx}[1]{%  define our acronym command,  make it short since we use it a lot, use * for so that it is only a 'short' command
+    \ifglsused{#1}{% if we used it already, then put pdftooltip
+      {\pdftooltip{\accolor{\glsentryshortpl{#1}}}{\glsentrydesc{#1}}}%
+      % {{\accolor{\glsentryshortpl{#1}}}\pdfsquarecomment{\glsentrydesc{#1}}}%
+    }{%
+      \gls{#1}% otherwise put the normal gls
+    }%
+}%
+
+% Your list of acronyms (sorted, for ease of entering new ones).
+% 
+\newacronym{bmof}{BMOF}{Block Matching Optical Flow}
+\newacronym{bm}{BM}{Block Matching}
+% note a longer text to show readers the longer description
+\newacronym[description={Multipurpose Block RAM memory module in FPGA}]{bram}{BRAM}{Block RAM}
+\newacronym{dnn}{DNN}{Deep Neural Network}
+\newacronym{dram}{DRAM}{Dynamic RAM}
+\newacronym[description={Direction Selective model of motion detection in biological vision, usually either Hassenstein-Reichhardt or Barlow-Levick type}]{ds}{DS}{Direction Selective}
+\newacronym{fpga}{FPGA}{Field Programmable Gate Array}
+\newacronym{gt}{GT}{Ground Truth}
+\newacronym{of}{OF}{Optical Flow}
+\newacronym[description={Register Transfer Logic intermediate form, consisting of combinational and synchronous register logic cells}]{rtl}{RTL}{Register Transfer Logic}
+\newacronym{timsl}{TS}{time slice}
+
