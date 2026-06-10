@@ -1,0 +1,144 @@
+\usepackage{pdfcomment}
+
+\makeatletter
+% Dual tooltips: original pdfcomment /Btn /TU widget + /Square /Contents markup.
+% Viewers differ — Acrobat favors /Btn; SumatraPDF/muPDF favor /Square. Both overlap.
+%
+% Square popup: omit /Subj; combined height, depth 0 (cleaner popup in some viewers).
+
+\newcommand{\acronymtooltips@pdftooltip@square@pdf}{%
+  \pdfannot width \the\pc@box@width height \the\pc@box@height depth \the\pc@box@depth%
+  {%
+    /Subtype /Square%
+    /Contents (\pc@pdfenc@contents)%
+    /BS << /W 0 >>%
+    /C [ ]%
+  }%
+}
+
+\newcommand{\acronymtooltips@pdftooltip@widget@pdf}{%
+  \pdfannot width \the\pc@box@width height \the\pc@box@height depth \the\pc@box@depth%
+  {%
+    /Subtype /Widget\space%
+    \pc@annot@tooltip%
+  }%
+}
+
+\newcommand{\acronymtooltips@pdftooltip@square@special}{%
+  \special{pdf: ann width \the\pc@box@width\space height \the\pc@box@height\space depth \the\pc@box@depth%
+    <<%
+      /Subtype /Square%
+      /Contents (\pc@pdfenc@contents)%
+      /BS << /W 0 >>%
+      /C [ ]%
+    >>%
+  }%
+}
+
+\newcommand{\acronymtooltips@pdftooltip@widget@special}{%
+  \special{pdf: ann width \the\pc@box@width\space height \the\pc@box@height\space depth \the\pc@box@depth%
+    <<%
+      /Subtype /Widget\space%
+      \pc@annot@tooltip%
+    >>%
+  }%
+}
+
+\def\acronymtooltips@pdftooltip@measure@text#1{%
+  \hspace*{0pt}%
+  \setbox\pc@nullbox=\hbox{#1}%
+  \pc@box@width=\wd\pc@nullbox
+  \pc@box@height=\dimexpr\ht\pc@nullbox+\dp\pc@nullbox\relax
+  \pc@box@depth=0pt
+}
+
+\newcommand{\acronymtooltips@pdftooltip@emit@pdf}{%
+  \acronymtooltips@pdftooltip@square@pdf
+  \acronymtooltips@pdftooltip@widget@pdf
+}
+
+\newcommand{\acronymtooltips@pdftooltip@emit@special}{%
+  \acronymtooltips@pdftooltip@square@special
+  \acronymtooltips@pdftooltip@widget@special
+}
+
+\ifpdf
+  \renewcommand{\pdftooltip}[3][]%
+  {%
+    \leavevmode%
+    \pc@copy@gopt@lopt
+    \setkeys{pdftooltip}{#1}%
+    \ifmmode%
+      \setbox\pc@nullbox=\hbox{\pc@encode@PDF@math{#3}}%
+      \ifpc@lopt@disable%
+        #2%
+      \else%
+        \settowidth{\pc@box@width}{$\pc@lopt@mathstyle#2$}%
+        \settoheight{\pc@box@height}{$\pc@lopt@mathstyle#2$}%
+        \settodepth{\pc@box@depth}{$\pc@lopt@mathstyle#2$}%
+        \acronymtooltips@pdftooltip@emit@pdf
+        #2%
+      \fi%
+    \else%
+      \expandafter\pc@encode@PDF{#3}%
+      \ifpc@lopt@disable%
+        #2%
+      \else%
+        \acronymtooltips@pdftooltip@measure@text{#2}%
+        \acronymtooltips@pdftooltip@emit@pdf
+        #2%
+      \fi%
+    \fi%
+    \stepcounter{zref@unique}%
+    \gdef\pc@lopt@mathstyle{}%
+  }%
+\else
+  \renewcommand{\pdftooltip}[3][]%
+  {%
+    \leavevmode%
+    \pc@copy@gopt@lopt
+    \setkeys{pdftooltip}{#1}%
+    \ifmmode%
+      \setbox\pc@nullbox=\hbox{\pc@encode@PDF@math{#3}}%
+      \ifpc@lopt@disable%
+        #2%
+      \else%
+        \settowidth{\pc@box@width}{$\pc@lopt@mathstyle#2$}%
+        \settoheight{\pc@box@height}{$\pc@lopt@mathstyle#2$}%
+        \settodepth{\pc@box@depth}{$\pc@lopt@mathstyle#2$}%
+        \ifpc@gopt@dvipdfmx%
+          \acronymtooltips@pdftooltip@emit@special
+          #2%
+        \else%
+          \pdfmark[\pc@lopt@mathstyle#2]%
+          {%
+            pdfmark=/ANN,%
+            Subtype=/Widget,%
+            Raw={\pc@annot@tooltip}%
+          }%
+        \fi%
+      \fi%
+    \else%
+      \expandafter\pc@encode@PDF{#3}%
+      \ifpc@lopt@disable%
+        #2%
+      \else%
+        \acronymtooltips@pdftooltip@measure@text{#2}%
+        \ifpc@gopt@dvipdfmx%
+          \acronymtooltips@pdftooltip@emit@special
+          #2%
+        \else%
+          \pdfmark[#2]%
+          {%
+            pdfmark=/ANN,%
+            Subtype=/Widget,%
+            Raw={\pc@annot@tooltip}%
+          }%
+        \fi%
+      \fi%
+    \fi%
+    \stepcounter{zref@unique}%
+    \gdef\pc@lopt@mathstyle{}%
+  }%
+\fi
+\makeatother

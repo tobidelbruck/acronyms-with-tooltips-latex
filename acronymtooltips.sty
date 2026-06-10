@@ -1,0 +1,65 @@
+% acronymtooltips.sty — PDF tooltip popups for glossaries acronyms
+% author: Tobi Delbruck (tobi@ini.uzh.ch)
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{acronymtooltips}[2026/06/10 v1.0 Acronym tooltips for PDF viewers]
+
+\input{acronymtooltips-pdfcomment}
+
+\RequirePackage[hyperfirst=false,acronym,shortcuts,nopostdot,style=super,nonumberlist,toc,nogroupskip]{glossaries}
+\RequirePackage[dvipsnames]{xcolor}
+
+\glsdisablehyper
+
+% Colors — customize these in your preamble after \usepackage{acronymtooltips}
+\newcommand{\accolor}[1]{\textcolor{Black}{#1}}
+\newcommand*{\glossfirstformat}[1]{\accolor{#1}}
+\newcommand*{\acfirstformat}[1]{\textcolor{Sepia}{\textbf{#1}}}
+
+\newacronymstyle{myacro}
+{%
+  \GlsUseAcrEntryDispStyle{long-short}%
+}%
+{%
+  \GlsUseAcrStyleDefs{long-short}%
+  \renewcommand*{\genacrfullformat}[1]{%
+   \glossfirstformat{\glsentrylong{##1}}\space
+   (\acfirstformat{\glsentryshort{##1}})%
+  }%
+  \renewcommand*{\Genacrfullformat}[2]{%
+   \glossfirstformat{\Glsentrylong{##1}}\space
+   (\glsentryshort{##1})%
+  }%
+  \renewcommand*{\genplacrfullformat}[2]{%
+   \glossfirstformat{\glsentrylongpl{##1}}\space
+   (\acplfirstformat{\glsentryshort{##1}})%
+  }%
+  \renewcommand*{\Genplacrfullformat}[2]{%
+   \glossfirstformat{\Glsentrylongpl{##1}}\space
+   (\glsentryshortpl{##1})%
+  }%
+}
+
+\setacronymstyle{myacro}
+
+% \xx{key} — singular acronym with PDF tooltip on subsequent uses
+\newcommand*{\xx}[1]{%
+    \ifglsused{#1}{%
+      {\pdftooltip{\accolor{\glsentryshort{#1}}}{\glsentrydesc{#1}}}%
+    }{%
+      \gls{#1}%
+    }%
+}
+
+% \xxx{key} — plural acronym with PDF tooltip on subsequent uses
+\newcommand*{\xxx}[1]{%
+    \ifglsused{#1}{%
+      {\pdftooltip{\accolor{\glsentryshortpl{#1}}}{\glsentrydesc{#1}}}%
+    }{%
+      \gls{#1}%
+    }%
+}
+
+% No shell escape needed on Overleaf
+\makenoidxglossaries
+
+\endinput
