@@ -5,3 +5,4 @@ See the example overleaf project https://www.overleaf.com/read/fyvbnxpwwjss#6de3
 
 <img width="682" height="361" alt="tooltip-example" src="https://github.com/user-attachments/assets/f6833abb-d5f2-44f3-8739-b54e1cbd18bb" />
 
+How it works: It uses wonderful glossaries package and pdfcomment package but patches pdfcomment to use a rect annotation instead of the default Btn, which some PDF viewers don't support in 2026.
