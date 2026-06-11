@@ -69,37 +69,57 @@ Customize colors in `acronymtooltips.sty` or redefine `\accolor` and `\acfirstfo
 
 ## PDF viewer compatibility
 
-| Viewer | Tooltips on hover | Notes |
-|--------|-------------------|-------|
+Tested with `main.pdf` in this repo. Dual annotations emit both `/Square` `/Contents` and `/Btn` `/TU` on the same rectangle.
+
+| Viewer | Hover tooltip | Notes |
+|--------|---------------|-------|
 | Adobe Acrobat / Reader | Yes | Reference behavior |
-| SumatraPDF (muPDF) | Yes | Needs Square patch (default pdfcomment `/Btn` does not work) |
-| muPDF | Same as SumatraPDF | |
-| Cursor / VS Code PDF preview (PDF.js) | Partial | Yellow popup with split layout; text usually visible |
-| Overleaf built-in preview (PDF.js) | Yes | Hover tooltip works |
-| Firefox PDF viewer (PDF.js) | Variable | PDF.js-based |
-| Google Chrome built-in PDF viewer (PDF.js) | No | No tooltip on hover; toggling annotations does not help |
-| Okular | Yes | Enable “show annotations”; tooltip on hover |
-| Evince | Yes | Tooltip on hover |
+| SumatraPDF 3.7+ (muPDF) | Yes | Square patch required (default pdfcomment `/Btn` alone fails) |
+| Overleaf built-in preview (PDF.js) | Yes | Yellow highlight + popup |
+| Evince (Linux) | Yes | Hover popup |
+| Okular (Linux) | Yes | Enable **Show annotations** and **Show forms** (Settings → PDF) |
+| macOS Preview / Mac PDF viewer | No | Click shows form-field handles only; no tooltip text |
+| Google Chrome PDF viewer (PDF.js) | No | Click shows dotted form-field outline only; no tooltip |
+| Firefox PDF viewer (PDF.js) | Yes | Tested Firefox 151.0.3 on Ubuntu 22; dark hover popup |
+| Cursor / VS Code PDF preview (PDF.js) | Partial | May show yellow split popup; inconsistent |
 
-The PDF spec does not strictly define tooltip behavior; viewers differ. Dual annotations cover both common mechanisms (`/Square` `/Contents` vs `/Btn` `/TU`); viewers use whichever they support.
+The PDF spec does not strictly define tooltip behavior; viewers differ. `/Btn` `/TU` widgets work like native tooltips in Acrobat; Poppler-based viewers (Evince, Okular) respond to `/Square` `/Contents`. Firefox’s PDF.js build shows hover tooltips in our tests; Chrome’s PDF.js and macOS Preview treat the `/Btn` layer as a form field (click-to-select) without hover tooltip text.
 
-On Linux, Evince and Okular work for hover tooltips with this dual-annotation PDF (Okular requires annotations visible). Overleaf preview works. Chrome’s built-in viewer does not.
+### Viewer screenshots
 
-## Sync to Overleaf (Dropbox)
+Thumbnail captures from the same `main.pdf` (hover over `\xxx{fpga}` or similar unless noted):
 
-If this repo is synced separately from your Overleaf Dropbox folder, copy builds into the synced test project:
+<table>
+<tr>
+<td align="center"><img src="screenshots/acrobat.png" width="200" alt="Adobe Acrobat"/><br/><b>Acrobat</b><br/>✓ hover</td>
+<td align="center"><img src="screenshots/sumatra3.7.png" width="200" alt="SumatraPDF 3.7"/><br/><b>SumatraPDF 3.7</b><br/>✓ hover</td>
+<td align="center"><img src="screenshots/overleaf.png" width="200" alt="Overleaf preview"/><br/><b>Overleaf</b><br/>✓ hover</td>
+<td align="center"><img src="screenshots/evince.png" width="200" alt="Evince"/><br/><b>Evince</b><br/>✓ hover</td>
+</tr>
+<tr>
+<td align="center"><img src="screenshots/okular.png" width="200" alt="Okular"/><br/><b>Okular</b><br/>✓ hover<br/><small>annotations + forms on</small></td>
+<td align="center"><img src="screenshots/firefox.png" width="200" alt="Firefox 151 on Ubuntu"/><br/><b>Firefox 151</b><br/>✓ hover</td>
+<td align="center"><img src="screenshots/mac-mini.png" width="200" alt="macOS Preview"/><br/><b>macOS Preview</b><br/>✗ click only</td>
+<td align="center"><img src="screenshots/chrome-linux-ubuntu22.png" width="200" alt="Chrome on Ubuntu"/><br/><b>Chrome (PDF.js)</b><br/>✗ click only</td>
+</tr>
+</table>
 
-```bash
-./sync-to-overleaf.sh
-```
+### Chrome and macOS Preview: why no hover tooltip?
 
-Default target: `/home/tobi/Dropbox/Apps/Overleaf/acronyms_with_tooltip_test`. Override with:
+Chrome and macOS Preview pick up the invisible `/Btn` form field and show **selection chrome on click** (dotted outline in Chrome, blue handles on Mac). Neither displays `/TU` or `/Square` `/Contents` as a hover tooltip in our tests. Firefox (also PDF.js-based) does show hover tooltips on Ubuntu 22.
 
-```bash
-OVERLEAF_DST=/path/to/your/overleaf/project ./sync-to-overleaf.sh
-```
+Possible directions (not implemented yet):
 
-Then compile in Overleaf or open the synced PDF locally (Evince, Okular, or Overleaf preview).
+1. **Square-only mode** — omit the `/Btn` widget layer so PDF.js at least stops showing form-field UI on click (tooltips would still be missing in Chrome; desktop viewers that need Square keep working).
+2. **`/Text` + `/Popup` child annotations** — closer to PDF “comment popup” spec; worth testing in Evince/Okular/PDF.js if someone wants to experiment.
+3. **Tell readers** — for browser viewing, Firefox works; Chrome does not. First-use expansion (`\xx` prints the long form once) always helps; for hover on repeated acronyms recommend Evince, Okular, Firefox, Overleaf preview, Acrobat, or SumatraPDF.
+4. **Track PDF.js** — [Mozilla bug 1661419](https://bugzilla.mozilla.org/show_bug.cgi?id=1661419) and pdf.js annotation issues; browser support may improve over time.
+
+On Linux, Evince, Okular, and Firefox work well. Overleaf preview works. Chrome and macOS Preview do not.
+
+## Updating an Overleaf project
+
+Upload the files from [Overleaf upload checklist](#overleaf-upload-checklist) via the Overleaf web UI, or copy them into your project folder if you use Dropbox (or another sync) with Overleaf. Recompile in Overleaf, then test the PDF preview.
 
 ## Legacy files
 
@@ -117,4 +137,4 @@ pdflatex main.tex
 pdflatex main.tex
 ```
 
-Open `main.pdf` in Evince, Okular (annotations on), Overleaf preview, or Acrobat and hover over repeated acronyms (e.g. the second `\xx{of}`) to see tooltips.
+Open `main.pdf` in Evince, Okular (**Show annotations** + **Show forms**), Firefox, Overleaf preview, or Acrobat and hover over repeated acronyms (e.g. the second `\xx{of}`) to see tooltips.

@@ -34,3 +34,6 @@
 .DS_Store
 *.swp
 *~
+
+# Local-only dev helpers (not in public repo)
+sync-to-overleaf.sh
